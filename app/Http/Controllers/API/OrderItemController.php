@@ -10,70 +10,45 @@ class OrderItemController extends Controller
 {
     public function index()
     {
-        return OrderItem::with(['order', 'product'])->get();
+        return OrderItem::with('product:id,name,price', 'order:id,order_number')->get();
+    }
+
+    public function show($id)
+    {
+        return OrderItem::with('product', 'order')->findOrFail($id);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,id',
+            'order_id'   => 'required|exists:orders,id',
             'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-            'total_price' => 'required|numeric',
+            'quantity'   => 'required|integer|min:1',
+            'price'      => 'required|numeric|min:0',
         ]);
 
-        return OrderItem::create($validated);
+        $item = OrderItem::create($validated);
+        return response()->json($item, 201);
     }
 
-    public function show($id)
+    public function update(Request $request, $id)
     {
-        $orderItem = OrderItem::with(['order', 'product'])->findOrFail($id);
+        $item = OrderItem::findOrFail($id);
 
-        $response = $orderItem->toArray();
-
-        // Customize order info
-        if ($orderItem->order) {
-            $response['order'] = [
-                'id' => $orderItem->order->id,
-                'order_number' => $orderItem->order->order_number,
-                'status' => $orderItem->order->status,
-                'total_amount' => $orderItem->order->total_amount,
-                'customer_id' => $orderItem->order->customer_id,
-            ];
-        }
-
-        // Customize product info
-        if ($orderItem->product) {
-            $response['product'] = [
-                'id' => $orderItem->product->id,
-                'name' => $orderItem->product->name,
-                'description' => $orderItem->product->description,
-                'price' => $orderItem->product->price,
-                'stock' => $orderItem->product->stock,
-            ];
-        }
-
-        return response()->json($response);
-    }
-
-    public function update(Request $request, OrderItem $orderItem)
-    {
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer',
-            'price' => 'required|numeric',
-            'total_price' => 'required|numeric',
+            'quantity' => 'required|integer|min:1',
+            'price'    => 'required|numeric|min:0',
         ]);
-        $orderItem->update($validated);
-        $orderItem->refresh();
-        return response()->json($orderItem);
+
+        $item->update($validated);
+        return response()->json($item);
     }
 
-    public function destroy(OrderItem $orderItem)
+    public function destroy($id)
     {
-        $orderItem->delete();
-        return response()->noContent();
+        $item = OrderItem::findOrFail($id);
+        $item->delete();
+
+        return response()->json(null, 204);
     }
 }
