@@ -10,6 +10,7 @@ use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\API\AuthTestController;
 use App\Http\Controllers\API\MpesaController;
+use App\Http\Controllers\API\SmsController;
 
     // Public
     Route::post('register', [AuthController::class, 'register']);
@@ -17,6 +18,21 @@ use App\Http\Controllers\API\MpesaController;
     Route::post('/forgot-password', [AuthController::class, 'sendResetOtp']);
     Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
     Route::get('/test-token', [AuthTestController::class, 'getToken']);
+
+    Route::prefix('mpesa')->group(function () {
+            Route::get('token', [MpesaController::class, 'token']);
+            Route::post('register-url', [MpesaController::class, 'registerClientUrl']);
+            Route::post('push', [MpesaController::class, 'stkPushRequest']);
+            Route::post('push/status', [MpesaController::class, 'checkStkPushStatus']);
+            Route::post('push/response', [MpesaController::class, 'stkPushCallback']);
+            Route::post('callbacks/stk', [MpesaController::class, 'stkPushCallback'])->name('mpesa.stk.callback');
+            Route::post('c2b/confirmation', [MpesaController::class, 'c2bConfirmation'])->name('mpesa.c2b.confirmation');
+            Route::post('c2b/validation', [MpesaController::class, 'validation'])->name('mpesa.c2b.validation');
+            Route::post('amount/validate', [MpesaController::class, 'amountBeingPaidIsValid']);
+        });
+
+    Route::post('africastalking/sms', [SmsController::class, 'send']);
+
 
     
 // Authenticated
@@ -31,15 +47,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('products',           [ProductController::class, 'index']);
     Route::get('products/{id}',      [ProductController::class, 'show']);
 
-    // --- M-PESA Integration ---
-    Route::post('/mpesa/stkpush', [MpesaController::class, 'stkPush']);
-    Route::post('/mpesa/callback', [MpesaController::class, 'stkCallback']);
-    Route::post('/stk/push/{id}', [MpesaController::class, 'payOrder']);
 
-    // M-PESA C2B (Customer to Business) routes
-    Route::post('/c2b/confirmation', [MpesaController::class, 'confirm']);
-    Route::post('/c2b/validation', [MpesaController::class, 'validateTransaction']);
-    Route::get('/c2b/register', [MpesaController::class, 'registerUrls']);
+        
+
     
     
     // Client‑only actions

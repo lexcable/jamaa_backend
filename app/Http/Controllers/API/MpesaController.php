@@ -2,102 +2,105 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Traits\Mpesa;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Traits\MpesaTrait;
 
 class MpesaController extends Controller
 {
-    use Mpesa;
-
-    public function initiateStkPush(Request $request)
-{
-    dump('test 1');
-    $validated = $request->validate([
-        'phone' => 'required|string',
-    ]);
-
-    $phone = preg_replace('/\s+/', '', $validated['phone']); // Remove spaces
-    $phone = ltrim($phone, '+');
-    dump('test 2');
-    if (preg_match('/^0/', $phone)) {
-        $phone = '254' . substr($phone, 1);
+    use MpesaTrait {
+        stkPushRequest as performStkPushRequest;
+        stkPushCallback as performStkPushCallback;
     }
 
+    // Generate Access Token
+    public function token()
+    {
+        try {
+            $accessToken = $this->generateAccessToken();
 
-    dump('test 3');
-    if (!preg_match('/^2547\d{8}$/', $phone)) {
+            return response()->json([
+                'status'       => 'success',
+                'access_token' => $accessToken,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    // Register C2B Confirmation and Validation URLs
+    public function registerClientUrl()
+    {
+        return response()->json($this->registerUrls());
+    }
+
+    // Initiate STK Push
+    public function stkPushRequest(Request $request)
+    {
+        $data = $request->validate([
+            'phone'             => 'required|string',
+            'amount'            => 'required|numeric',
+            'account_reference' => 'required|string',
+            'description'       => 'required|string',
+            'callback_url'      => 'nullable|url',
+        ]);
+
+        $response = $this->performStkPushRequest(
+            $data['phone'],
+            $data['amount'],
+            $data['account_reference'],
+            $data['description'],
+            $data['callback_url'] ?? null
+        );
+
+        return response()->json($response);
+    }
+
+    // Query STK Push Status
+    public function checkStkPushStatus(Request $request)
+    {
+        $data = $request->validate([
+            'checkout_request_id' => 'required|string',
+        ]);
+
+        return response()->json($this->stkTransactionQuery($data['checkout_request_id']));
+    }
+
+    // STK Callback Receiver
+    public function stkPushCallback(Request $request)
+    {
+        $result = $this->performStkPushCallback($request->all());
+        return response()->json(['status' => 'received', 'data' => $result]);
+    }
+
+    // C2B Confirmation Receiver
+    public function c2bConfirmation(Request $request)
+    {
+        return $this->c2bConfirmationCallback($request);
+    }
+
+    // C2B Validation Receiver
+    public function validation(Request $request)
+    {
+        return $this->c2bValidationCallback($request);
+    }
+
+    // Verify Paid Amount
+    public function amountBeingPaidIsValid(Request $request)
+    {
+        $data = $request->validate([
+            'expected_amount' => 'required|numeric',
+            'paid_amount'     => 'required|numeric',
+        ]);
+
+        $valid = $this->amountIsEqual($data['paid_amount'], $data['expected_amount']);
+
         return response()->json([
-            'error' => 'Invalid phone number format. Must start with 07 or 2547.'
-        ], 422);
+            'valid' => $valid,
+            'message' => $valid ? 'Amount matches' : 'Amount does not match'
+        ]);
     }
-
-    // Now call with 4 arguments
-    $response = $this->stkPush(
-        $phone,
-        1, // amount
-        'TestRef', // account reference
-        'Payment description' // description
-    );
-
-    return response()->json($response);
-}
-
-
-    public function stkCallback(Request $request)
-    {
-        $cb = $this->handleStkCallback($request->all());
-        // Process $cb...
-    }
-
-    public function registerUrls()
-    {
-        $resp = $this->registerUrls();
-        return response()->json($resp);
-    }
-
-    public function confirm(Request $request)
-    {
-        $resp = $this->handleC2bConfirmation($request->all());
-        return response()->json($resp);
-    }
-
-    public function validateTransaction(Request $request)
-    {
-        $resp = $this->handleC2bValidation($request->all());
-        return response()->json($resp);
-    }
-
-    public function payOrder(Request $request, $id)
-{
-    $validated = $request->validate([
-        'phone' => 'required|string',
-    ]);
-    dump('test 4');
-    $phone = preg_replace('/\s+/', '', $validated['phone']);
-    $phone = ltrim($phone, '+');
-
-    dump('test 5');
-    if (preg_match('/^0/', $phone)) {
-        $phone = '254' . substr($phone, 1);
-    }
-
-    dump('test 6');
-    if (!preg_match('/^2547\d{8}$/', $phone)) {
-        return response()->json([
-            'error' => 'Invalid phone number format. Must start with 07 or 2547.'
-        ], 422);
-    }
-
-    // Now pass all 4 arguments
-    $response = $this->stkPush(
-        $phone,
-        100,           // Amount you want to charge, e.g., 100 KES
-        'ORDER-' . $id, // Account reference (can be order ID)
-        'Order Payment' // Description
-    );
-
-    return response()->json($response);
-}
-
 }

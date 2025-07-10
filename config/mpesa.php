@@ -35,7 +35,7 @@ return [
     |
     */
 
-    'env'             => env('MPESA_ENV', 'sandbox'),
+    'env'             => env('MPESA_ENV'),
 
     /*
     |--------------------------------------------------------------------------
@@ -58,8 +58,7 @@ return [
     |
     */
 
-    'oauth_endpoint'        => env('MPESA_OAUTH_ENDPOINT', 'https://sandbox.safaricom.co.ke/oauth/v1/generate'),
-    'stk_push_endpoint'     => env('MPESA_STK_PUSH_ENDPOINT', 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'),
-    'c2b_register_endpoint' => env('MPESA_C2B_REGISTER_ENDPOINT', 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl'),
-
-];
+    'oauth_endpoint'        => env('MPESA_OAUTH_ENDPOINT'),
+    'stk_push_endpoint'     => env('MPESA_STK_PUSH_ENDPOINT'),
+    'c2b_register_endpoint' => env('MPESA_C2B_REGISTER_ENDPOINT')
+];    
