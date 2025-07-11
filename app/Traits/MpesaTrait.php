@@ -10,7 +10,6 @@ trait MpesaTrait
     public function getToken()
     {
         $credentials = base64_encode(env('MPESA_CONSUMER_KEY') . ':' . env('MPESA_CONSUMER_SECRET'));
-
         $url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
 
         $response = Http::withHeaders([
@@ -24,13 +23,31 @@ trait MpesaTrait
         throw new \Exception('Failed to generate access token: ' . $response->body());
     }
 
-     public function generateAccessToken()
+    public function generateAccessToken()
     {
         return $this->getToken();
     }
 
+    // ✅ PHONE NORMALIZER
+    public function normalizePhoneNumber($phone)
+    {
+        $phone = preg_replace('/\D/', '', $phone); // Remove non-numeric characters
+
+        if (substr($phone, 0, 1) === '0') {
+            $phone = '254' . substr($phone, 1);
+        }
+
+        if (substr($phone, 0, 3) !== '254') {
+            throw new \Exception('Invalid phone number format. Must start with 0 or 254');
+        }
+
+        return $phone;
+    }
+
     public function stkPushRequest($phone, $amount, $accountReference, $transactionDesc)
     {
+        $phone = $this->normalizePhoneNumber($phone); // Normalize phone before use
+
         $url = env('MPESA_BASE_URL') . '/mpesa/stkpush/v1/processrequest';
         $accessToken = $this->getToken();
 
