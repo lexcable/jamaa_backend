@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\CategoryController;
-use App\Http\Controllers\API\ProductController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\OrderItemController;
 use App\Http\Controllers\API\AuthTestController;
@@ -28,8 +28,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('categories/{category}',[CategoryController::class, 'show']);
 
     // --- Products (any authenticated user can READ) ---
-    Route::get('products',           [ProductController::class, 'index']);
-    Route::get('products/{id}',      [ProductController::class, 'show']);
+    //Route::get('products',           [ProductController::class, 'index']);
+    //Route::get('products/{id}',      [ProductController::class, 'show']);
 
     // --- M-PESA Integration ---
     Route::post('/mpesa/stkpush', [MpesaController::class, 'stkPush']);
@@ -79,3 +79,6 @@ Route::middleware('auth:api')->group(function () {
              ->except(['create','edit']);
     });
 });
+
+
+Route::post('/products/store', [ProductController::class, 'store'])->name('products.store');
