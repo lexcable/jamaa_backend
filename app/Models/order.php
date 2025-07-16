@@ -13,6 +13,9 @@ class Order extends Model
         'total',
         'status',
         'payment_status',
+        'customer_id',
+        'delivery_state',
+        'payment_method',
     ];
 
     // Auto-generate order_number on creation
@@ -29,6 +32,10 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function customer() {
+        return $this->belongsTo(Customer::class);
+    }
+
     // An order has many order items
     public function items()
     {
@@ -40,5 +47,7 @@ class Order extends Model
         return $this->hasOne(Payment::class);
     }
 
+    public function getTotalAmountAttribute() {
+        return $this->items->sum(fn($i) => $i->price * $i->quantity);
+    }
 }
-

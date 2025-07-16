@@ -13,6 +13,7 @@ class Product extends Model
         'price',
         'image',
         'stock',
+        'reorder_point',
     ];
 
     // Belongs to a category

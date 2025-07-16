@@ -81,6 +81,13 @@
                 class="w-full px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:outline-none">
         </div>
 
+        <!-- Reorder Point -->
+        <div>
+            <label class="block mb-2 font-medium text-gray-700">Reorder Point</label>
+            <input type="number" name="reorder_point" placeholder="Enter reorder point"
+                class="w-full px-4 py-2 bg-white text-gray-800 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-300 focus:outline-none">
+        </div>
+
         <!-- Submit Button -->
         <div>
             <button type="submit"

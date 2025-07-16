@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-gradient-to-r from-purple-400 to-blue-500 min-h-screen p-6">
+@extends('layouts.app')
+
+@section('content')
 
     <div class="bg-white rounded-xl shadow-lg p-6 max-w-7xl mx-auto">
         <h1 class="text-2xl font-bold text-gray-800 mb-2">SALES DASHBOARD <span class="text-sm text-gray-500">Super Market Shop</span></h1>
@@ -171,5 +164,5 @@
         });
     </script>
 
-</body>
-</html>
+
+@endsection

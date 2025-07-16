@@ -1,13 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-gray-100 p-6">
+@extends('layouts.app')
+
+@section('content')
 
     <div class="max-w-7xl mx-auto bg-white rounded-xl shadow p-6">
 
@@ -51,6 +44,8 @@
                         <th class="p-2 border">Category</th>
                         <th class="p-2 border">Price</th>
                         <th class="p-2 border">Stock</th>
+                        <th class="p-2 border">Reorder Point</th>
+                        <th class="p-2 border">Status</th>
                         <th class="p-2 border">Sold</th>
                         <th class="p-2 border">Actions</th>
                     </tr>
@@ -69,6 +64,26 @@
                             <td class="border p-2">{{ $product->category->name ?? 'N/A' }}</td>
                             <td class="border p-2">{{ $product->price }}</td>
                             <td class="border p-2">{{ $product->stock }}</td>
+                            <td class="border p-2">{{ $product->reorder_point ?? 0 }}</td>
+                            <td class="border p-2">
+                                @php
+                                    $stock = $product->stock;
+                                    $reorder = $product->reorder_point ?? 0;
+                                    if ($stock == 0) {
+                                        $status = 'Stagnant';
+                                        $class = 'bg-gray-200 text-gray-800';
+                                    } elseif ($stock <= $reorder) {
+                                        $status = 'Low Stock';
+                                        $class = 'bg-yellow-200 text-yellow-800';
+                                    } else {
+                                        $status = 'In Stock';
+                                        $class = 'bg-green-200 text-green-800';
+                                    }
+                                @endphp
+                                <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold {{ $class }}">
+                                    {{ $status }}
+                                </span>
+                            </td>
                             <td class="border p-2">{{ $product->sold }}</td>
                             <td class="border p-2 space-x-2">
                                 <a href="{{ route('products.edit', $product->id) }}" class="text-blue-500">Edit</a>
@@ -118,3 +133,4 @@
 
 </body>
 </html>
+@endsection

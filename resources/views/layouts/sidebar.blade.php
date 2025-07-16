@@ -13,11 +13,11 @@
         <a href="/sales" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('sales') ? 'bg-gray-700' : '' }}">
             Sales
         </a>
-        <a href="/expenses" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('expenses') ? 'bg-gray-700' : '' }}">
+        {{-- <a href="/expenses" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('expenses') ? 'bg-gray-700' : '' }}">
             Expenses
-        </a>
-        <a href="/stocks" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('stocks') ? 'bg-gray-700' : '' }}">
-            Stocks
+        </a> --}}
+        <a href="/teams" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('teams') ? 'bg-gray-700' : '' }}">
+            Teams
         </a>
         <a href="/products" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('products') ? 'bg-gray-700' : '' }}">
             Products
@@ -30,9 +30,6 @@
         </a>
         <a href="/reports" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('Reports') ? 'bg-gray-700' : '' }}"">
             Reports
-        </a>
-        <a href="/team" class="block px-4 py-2 rounded hover:bg-gray-700 {{ request()->is('Team') ? 'bg-gray-700' : '' }}"">
-            Team
         </a>
     </nav>
 </div>
